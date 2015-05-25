@@ -156,6 +156,15 @@ var moves = {
       return boardTile.type === 'Hero' && boardTile.team === myHero.team && boardTile.health < 60;
     });
     
+        //Get stats on the nearest friend in need
+    var bonesStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+      return boardTile.subType === 'Bones';
+    });
+    
+    var unoccupiedStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+      return boardTile.subType === 'Unoccupied';
+    });
+    
     
     console.log("getting stats...");
     var distanceToHealthWell = healthWellStats.distance;
@@ -173,52 +182,82 @@ var moves = {
     var distanceToScaryEnemy = scaryEnemyStats.distance;
     var directionToScaryEnemy = scaryEnemyStats.direction;
     
+    var distanceToBones = bonesStats.distance;
+    var directionToBones = bonesStats.direction;
+    
+    var distanceToUnoccupied = unoccupiedStats.distance;
+    var directionToUnoccupied = unoccupiedStats.direction;
+    
     console.log("getting stats...");
-    console.log("directionToMine: "+directionToMine);
+    
     console.log("distanceToMine: "+distanceToMine);
     console.log("distanceToScaryEnemy: "+distanceToScaryEnemy);
+    
+    console.log("directionToBones: "+directionToBones);
+    console.log("directionToScaryEnemy: "+directionToScaryEnemy);
+    console.log("directionToMine: "+directionToMine);
     console.log("directionToHealthWell: "+directionToHealthWell);
     console.log("directionToFriend: "+ directionToFriend);
     console.log("directionToEnemy: "+directionToEnemy);
+    console.log("directionToUnoccupied: "+directionToUnoccupied);
     
     if (distanceToHealthWell === 1 && myHero.health < 70) {
-      //jackpot, stay near hear
-          console.log("Result 1");
+      console.log("Result 1");
       return directionToHealthWell;
     } 
     
     if (myHero.health < 50) {
-      if (distanceToHealthWell <= distanceToFriend) {
-        
-          console.log("Result 2");
+      if (directionToHealthWell && distanceToHealthWell <= distanceToFriend) {
+        console.log("Result 2");
         return directionToHealthWell;
       }
-      if (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !== directionToFriend) {
-        
-          console.log("Result 3");
+      if (directionToFriend && (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !== directionToFriend)) {
+        console.log("Result 3");
         return directionToFriend;
       }
     }
     
-    if (distanceToMine <= 2 && (distanceToScaryEnemy > distanceToMine || directionToScaryEnemy !== directionToMine)) {
-     
-          console.log("Result 4");
+    if (directionToMine && myHero.health > 20 && distanceToMine <= 2 && (distanceToScaryEnemy > distanceToMine || directionToScaryEnemy !== directionToMine)) {
+     console.log("Result 4");
      return directionToMine;
     }
     
-    if (distanceToEnemy <= 3 && (distanceToScaryEnemy > distanceToEnemy || directionToScaryEnemy !== directionToEnemy)) {
-    
-          console.log("Result 5");
+    if (directionToEnemy && distanceToEnemy <= 3 && (distanceToScaryEnemy > distanceToEnemy || directionToScaryEnemy !== directionToEnemy)) {
+     console.log("Result 5");
      return directionToEnemy;
     }
     
-    if ((directionToEnemy === directionToFriend || distanceToFriend <= 2) && (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !== directionToFriend)) {
-      
-          console.log("Result 6");
+    if (directionToFriend && (directionToEnemy === directionToFriend || distanceToFriend <= 2) && distanceToScaryEnemy > 1 && (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !== directionToFriend)) {
+      console.log("Result 6");
       return directionToFriend;
     }
+    
+    if (directionToScaryEnemy && distanceToScaryEnemy < 3) {
+      if (directionToScaryEnemy !== directionToUnoccupied) {
+        console.log(directionToUnoccupied);
+        return directionToUnoccupied;
+      }
+    }
+    for (n = 2; n < 10; n++) { 
+      if (directionToEnemy && distanceToEnemy < n){
+        console.log("Enemy");
+        return directionToEnemy;
+      }
+      if (directionToBones && distanceToBones < n+1){
+        console.log("Bones");
+        return directionToBones;
+      }
+      if (directionToMine && distanceToMine < n){
+        console.log("Mine");
+        return directionToMine;
+      }
+      if (directionToFriend && distanceToFriend < n){
+        console.log("Friend");
+        return directionToFriend;
+      }
+    }
     console.log("Default result");
-    return helpers.findNearestNonTeamDiamondMine(gameData);
+    return directionToUnoccupied;
     
   },
 
