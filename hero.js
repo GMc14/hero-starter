@@ -126,23 +126,80 @@ var moves = {
 
     //Get stats on the nearest health well
     var healthWellStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
-      if (boardTile.type === 'HealthWell') {
-        return true;
+      return boardTile.type === 'HealthWell';
+    });
+    //Get stats on the nearest nonTeam mine
+    var mineStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+      if (boardTile.type === 'DiamondMine') {
+        if (boardTile.owner) {
+          return boardTile.owner.team !== hero.team;
+        } else {
+          return true;
+        }
+      } else {
+        return false;
       }
     });
+    
+    //Get stats on the nearest weak enemy
+    var enemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+      return boardTile.type === 'Hero' && boardTile.team !== hero.team && boardTile.health < hero.health - 20;
+    });
+    
+        //Get stats on the nearest weak enemy
+    var scaryEnemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+      return boardTile.type === 'Hero' && boardTile.team !== hero.team && boardTile.health >= hero.health;
+    });
+    
+    //Get stats on the nearest friend in need
+    var friendlyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+      return boardTile.type === 'Hero' && boardTile.team === hero.team; && boardTile.health < 60;
+    });
+    
+    
     var distanceToHealthWell = healthWellStats.distance;
     var directionToHealthWell = healthWellStats.direction;
-
-    if (myHero.health < 40) {
-      //Heal no matter what if low health
+        
+    var distanceToFriend = friendlyStats.distance;
+    var directionToFriend = friendlyStats.direction;
+    
+    var distanceToEnemy = enemyStats.distance;
+    var directionToEnemy = enemyStats.direction;
+    
+    var distanceToMine = mineStats.distance;
+    var directionToMine = mineStats.direction;
+    
+    var distanceToScaryEnemy = scaryEnemyStats.distance;
+    var directionToScaryEnemy = scaryEnemyStats.direction;
+    
+    if (distanceToHealthWell === 1 && myHero.health < 70) {
+      //jackpot, stay near hear
       return directionToHealthWell;
-    } else if (myHero.health < 100 && distanceToHealthWell === 1) {
-      //Heal if you aren't full health and are close to a health well already
-      return directionToHealthWell;
-    } else {
-      //If healthy, go capture a diamond mine!
-      return helpers.findNearestNonTeamDiamondMine(gameData);
+    } 
+    
+    if (myHero.health < 50) {
+      if (distanceToHealthWell <= distanceToFriend) {
+        return directionToHealthWell;
+      }
+      if (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !=== directionToFriend) {
+        return directionToFriend;
+      }
     }
+    
+    if (distanceToMine <= 2 && (distanceToScaryEnemy > distanceToMine || directionToScaryEnemy !=== directionToMine)) {
+     return directionToMine;
+    }
+    
+    if (distanceToEnemy <= 3 && (distanceToScaryEnemy > distanceToEnemy || directionToScaryEnemy !=== directionToEnemy)) {
+     return directionToEnemy;
+    }
+    
+    if ((directionToEnemy === directionToFriend || distanceToFriend <= 2)&& (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !=== directionToFriend)) {
+      return directionToFriend;
+    }
+
+    return helpers.findNearestNonTeamDiamondMine(gameData);
+    
   },
 
   // The "Selfish Diamond Miner"
@@ -180,7 +237,7 @@ var moves = {
  };
 
 //  Set our heros strategy
-var  move =  moves.aggressor;
+var  move =  moves.safeDiamondMiner;
 
 // Export the move function here
 module.exports = move;
