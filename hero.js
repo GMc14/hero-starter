@@ -124,6 +124,7 @@ var moves = {
   safeDiamondMiner : function(gameData, helpers) {
     var myHero = gameData.activeHero;
 
+    console.log("Logging Move...");
     //Get stats on the nearest health well
     var healthWellStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
       return boardTile.type === 'HealthWell';
@@ -132,31 +133,31 @@ var moves = {
     var mineStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
       if (boardTile.type === 'DiamondMine') {
         if (boardTile.owner) {
-          return boardTile.owner.team !== hero.team;
+          return boardTile.owner.team !== myHero.team;
         } else {
           return true;
         }
-      } else {
-        return false;
       }
+        return false;
+      
     });
-    
     //Get stats on the nearest weak enemy
     var enemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
-      return boardTile.type === 'Hero' && boardTile.team !== hero.team && boardTile.health < hero.health - 20;
+      return boardTile.type === 'Hero' && boardTile.team !== myHero.team && boardTile.health < myHero.health - 20;
     });
     
         //Get stats on the nearest weak enemy
     var scaryEnemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
-      return boardTile.type === 'Hero' && boardTile.team !== hero.team && boardTile.health >= hero.health;
+      return boardTile.type === 'Hero' && boardTile.team !== myHero.team && boardTile.health >= myHero.health;
     });
     
     //Get stats on the nearest friend in need
     var friendlyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
-      return boardTile.type === 'Hero' && boardTile.team === hero.team && boardTile.health < 60;
+      return boardTile.type === 'Hero' && boardTile.team === myHero.team && boardTile.health < 60;
     });
     
     
+    console.log("getting stats...");
     var distanceToHealthWell = healthWellStats.distance;
     var directionToHealthWell = healthWellStats.direction;
         
@@ -172,32 +173,51 @@ var moves = {
     var distanceToScaryEnemy = scaryEnemyStats.distance;
     var directionToScaryEnemy = scaryEnemyStats.direction;
     
+    console.log("getting stats...");
+    console.log("directionToMine: "+directionToMine);
+    console.log("distanceToMine: "+distanceToMine);
+    console.log("distanceToScaryEnemy: "+distanceToScaryEnemy);
+    console.log("directionToHealthWell: "+directionToHealthWell);
+    console.log("directionToFriend: "+ directionToFriend);
+    console.log("directionToEnemy: "+directionToEnemy);
+    
     if (distanceToHealthWell === 1 && myHero.health < 70) {
       //jackpot, stay near hear
+          console.log("Result 1");
       return directionToHealthWell;
     } 
     
     if (myHero.health < 50) {
       if (distanceToHealthWell <= distanceToFriend) {
+        
+          console.log("Result 2");
         return directionToHealthWell;
       }
       if (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !== directionToFriend) {
+        
+          console.log("Result 3");
         return directionToFriend;
       }
     }
     
     if (distanceToMine <= 2 && (distanceToScaryEnemy > distanceToMine || directionToScaryEnemy !== directionToMine)) {
+     
+          console.log("Result 4");
      return directionToMine;
     }
     
     if (distanceToEnemy <= 3 && (distanceToScaryEnemy > distanceToEnemy || directionToScaryEnemy !== directionToEnemy)) {
+    
+          console.log("Result 5");
      return directionToEnemy;
     }
     
     if ((directionToEnemy === directionToFriend || distanceToFriend <= 2) && (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !== directionToFriend)) {
+      
+          console.log("Result 6");
       return directionToFriend;
     }
-
+    console.log("Default result");
     return helpers.findNearestNonTeamDiamondMine(gameData);
     
   },
