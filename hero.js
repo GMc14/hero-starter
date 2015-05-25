@@ -153,7 +153,7 @@ var moves = {
     
     //Get stats on the nearest friend in need
     var friendlyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
-      return boardTile.type === 'Hero' && boardTile.team === hero.team; && boardTile.health < 60;
+      return boardTile.type === 'Hero' && boardTile.team === hero.team && boardTile.health < 60;
     });
     
     
@@ -194,7 +194,7 @@ var moves = {
      return directionToEnemy;
     }
     
-    if ((directionToEnemy === directionToFriend || distanceToFriend <= 2)&& (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !=== directionToFriend)) {
+    if ((directionToEnemy === directionToFriend || distanceToFriend <= 2) && (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !=== directionToFriend)) {
       return directionToFriend;
     }
 
