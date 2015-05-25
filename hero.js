@@ -143,7 +143,7 @@ var moves = {
     });
     //Get stats on the nearest weak enemy
     var enemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
-      return boardTile.type === 'Hero' && boardTile.team !== myHero.team && boardTile.health < myHero.health - 20;
+      return boardTile.type === 'Hero' && boardTile.team !== myHero.team && (boardTile.health < myHero.health - 20 || boardTile.health <= 20) ;
     });
     
         //Get stats on the nearest weak enemy
@@ -153,7 +153,7 @@ var moves = {
     
     //Get stats on the nearest friend in need
     var friendlyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
-      return boardTile.type === 'Hero' && boardTile.team === myHero.team && boardTile.health < 60;
+      return boardTile.type === 'Hero' && boardTile.team === myHero.team && boardTile.health < 50;
     });
     
         //Get stats on the nearest friend in need
@@ -188,10 +188,17 @@ var moves = {
     var distanceToUnoccupied = unoccupiedStats.distance;
     var directionToUnoccupied = unoccupiedStats.direction;
     
-    console.log("getting stats...");
-    
-    console.log("distanceToMine: "+distanceToMine);
+    console.log("Stats...");
+
+    console.log("distanceToBones: "+distanceToBones);
     console.log("distanceToScaryEnemy: "+distanceToScaryEnemy);
+    console.log("distanceToMine: "+distanceToMine);
+    console.log("distanceToHealthWell: "+distanceToHealthWell);
+    console.log("distanceToFriend: "+ distanceToFriend);
+    console.log("distanceToEnemy: "+distanceToEnemy);
+    console.log("distanceToUnoccupied: "+distanceToUnoccupied);
+    
+    console.log("...[][][]...");    
     
     console.log("directionToBones: "+directionToBones);
     console.log("directionToScaryEnemy: "+directionToScaryEnemy);
@@ -201,45 +208,48 @@ var moves = {
     console.log("directionToEnemy: "+directionToEnemy);
     console.log("directionToUnoccupied: "+directionToUnoccupied);
     
-    if (distanceToHealthWell === 1 && myHero.health < 70) {
-      console.log("Result 1");
+    if (distanceToHealthWell === 1 && myHero.health <= 70) {
+      console.log("Quick heal");
       return directionToHealthWell;
     } 
-    
-    if (myHero.health < 50) {
-      if (directionToHealthWell && distanceToHealthWell <= distanceToFriend) {
-        console.log("Result 2");
+
+    if (myHero.health <= 40) {
+      if (directionToHealthWell && distanceToHealthWell <= 2) {
+        console.log("Go to heal now!");
         return directionToHealthWell;
       }
-      if (directionToFriend && (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !== directionToFriend)) {
-        console.log("Result 3");
+      if (directionToFriend && distanceToFriend <= 2 && (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !== directionToFriend)) {
+        console.log("Go to friend to heal");
         return directionToFriend;
       }
     }
     
     if (directionToMine && myHero.health > 20 && distanceToMine <= 2 && (distanceToScaryEnemy > distanceToMine || directionToScaryEnemy !== directionToMine)) {
-     console.log("Result 4");
+     console.log("Go to mine");
      return directionToMine;
     }
     
-    if (directionToEnemy && distanceToEnemy <= 3 && (distanceToScaryEnemy > distanceToEnemy || directionToScaryEnemy !== directionToEnemy)) {
-     console.log("Result 5");
+    if (directionToEnemy && distanceToEnemy <= 2 && (distanceToScaryEnemy > distanceToEnemy || directionToScaryEnemy !== directionToEnemy)) {
+     console.log("Go to enemy");
      return directionToEnemy;
     }
     
-    if (directionToFriend && (directionToEnemy === directionToFriend || distanceToFriend <= 2) && distanceToScaryEnemy > 1 && (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !== directionToFriend)) {
-      console.log("Result 6");
-      return directionToFriend;
-    }
-    
-    if (directionToScaryEnemy && distanceToScaryEnemy < 3) {
+    if (directionToScaryEnemy && distanceToScaryEnemy <= 2) {
+      //RUN!
       if (directionToScaryEnemy !== directionToUnoccupied) {
-        console.log(directionToUnoccupied);
+        console.log("Go to Unoccupied");
         return directionToUnoccupied;
       }
     }
-    for (n = 2; n < 10; n++) { 
+    
+    if (directionToFriend && distanceToFriend < 4 && (directionToMine === directionToFriend || directionToBones === directionToFriend || directionToEnemy === directionToFriend || distanceToFriend < 2) && distanceToScaryEnemy > 1 && (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !== directionToFriend)) {
+      console.log("Go to friend");
+      return directionToFriend;
+    }
+    
+    for (n = 2; n < 18; n++) { 
       if (directionToEnemy && distanceToEnemy < n){
+        //unpredictable
         console.log("Enemy");
         return directionToEnemy;
       }
@@ -247,11 +257,16 @@ var moves = {
         console.log("Bones");
         return directionToBones;
       }
-      if (directionToMine && distanceToMine < n){
+      if (directionToMine && distanceToMine < n+1){
         console.log("Mine");
         return directionToMine;
       }
+      if (directionToHealthWell && distanceToHealthWell < n && myHero.health < (50 + 5*n)) {
+        console.log("Health Well");
+        return directionToHealthWell;
+      } 
       if (directionToFriend && distanceToFriend < n){
+        //unreliable
         console.log("Friend");
         return directionToFriend;
       }
