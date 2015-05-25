@@ -181,20 +181,20 @@ var moves = {
       if (distanceToHealthWell <= distanceToFriend) {
         return directionToHealthWell;
       }
-      if (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !=== directionToFriend) {
+      if (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !== directionToFriend) {
         return directionToFriend;
       }
     }
     
-    if (distanceToMine <= 2 && (distanceToScaryEnemy > distanceToMine || directionToScaryEnemy !=== directionToMine)) {
+    if (distanceToMine <= 2 && (distanceToScaryEnemy > distanceToMine || directionToScaryEnemy !== directionToMine)) {
      return directionToMine;
     }
     
-    if (distanceToEnemy <= 3 && (distanceToScaryEnemy > distanceToEnemy || directionToScaryEnemy !=== directionToEnemy)) {
+    if (distanceToEnemy <= 3 && (distanceToScaryEnemy > distanceToEnemy || directionToScaryEnemy !== directionToEnemy)) {
      return directionToEnemy;
     }
     
-    if ((directionToEnemy === directionToFriend || distanceToFriend <= 2) && (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !=== directionToFriend)) {
+    if ((directionToEnemy === directionToFriend || distanceToFriend <= 2) && (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !== directionToFriend)) {
       return directionToFriend;
     }
 
