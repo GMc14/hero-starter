@@ -143,7 +143,7 @@ var moves = {
     });
     //Get stats on the nearest weak enemy
     var enemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
-      return boardTile.type === 'Hero' && boardTile.team !== myHero.team && (boardTile.health < myHero.health - 20 || boardTile.health <= 20) ;
+      return boardTile.type === 'Hero' && boardTile.team !== myHero.team && (boardTile.health < myHero.health - 10 || boardTile.health <= 20) ;
     });
     
         //Get stats on the nearest weak enemy
@@ -237,7 +237,18 @@ var moves = {
     if (directionToScaryEnemy && distanceToScaryEnemy <= 2) {
       //RUN!
       if (directionToScaryEnemy !== directionToUnoccupied) {
-        console.log("Go to Unoccupied");
+        var value = Math.floor(Math.random() * (5 + 1)); //added random #0-5 to avoid loops 
+        console.log("Go to Unoccupied:"+value);
+        if (value==0 && directionToScaryEnemy !=='North') {
+          return 'North';
+        }if (value==1 && directionToScaryEnemy !=='South') {
+          return 'South';
+        } if (value==2 && directionToScaryEnemy !=='East') {
+          return 'East';
+        } if (value==3 && directionToScaryEnemy !=='West') {
+          return 'West';
+        }
+        console.log("Go to Unoccupied!!");
         return directionToUnoccupied;
       }
     }
