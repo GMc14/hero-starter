@@ -141,6 +141,12 @@ var moves = {
         return false;
       
     });
+        //Get stats on the nearest weak enemy
+    var crippledEnemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+      return boardTile.type === 'Hero' && boardTile.team !== myHero.team && boardTile.health <= 20;
+    });
+    
+    
     //Get stats on the nearest weak enemy
     var enemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
       return boardTile.type === 'Hero' && boardTile.team !== myHero.team && (boardTile.health < myHero.health - 10 || boardTile.health <= 20) ;
@@ -176,6 +182,9 @@ var moves = {
     var distanceToEnemy = enemyStats.distance;
     var directionToEnemy = enemyStats.direction;
     
+    var distanceToCrippledEnemy = crippledEnemyStats.distance;
+    var directionToCrippledEnemy = crippledEnemyStats.direction;
+    
     var distanceToMine = mineStats.distance;
     var directionToMine = mineStats.direction;
     
@@ -208,7 +217,12 @@ var moves = {
     console.log("directionToEnemy: "+directionToEnemy);
     console.log("directionToUnoccupied: "+directionToUnoccupied);
     
-    if (distanceToHealthWell === 1 && myHero.health <= 70) {
+    if (directionToCrippledEnemy && distanceToCrippledEnemy <= 2) {
+     console.log("Shoot First");
+     return directionToCrippledEnemy;
+    }
+    
+    if (distanceToHealthWell === 1 && myHero.health <= 60) {
       console.log("Quick heal");
       return directionToHealthWell;
     } 
@@ -236,18 +250,20 @@ var moves = {
     
     if (directionToScaryEnemy && distanceToScaryEnemy <= 2) {
       //RUN!
+      var value = Math.floor(Math.random() * (10)); //added random #0-9 to avoid loops 
+      
+        console.log("Go to Unoccupied: "+value);
+      if (value==0 && directionToScaryEnemy !=='North') {
+        return 'North';
+      }if (value==1 && directionToScaryEnemy !=='South') {
+        return 'South';
+      } if (value==2 && directionToScaryEnemy !=='East') {
+        return 'East';
+      } if (value==3 && directionToScaryEnemy !=='West') {
+        return 'West';
+      }
+        
       if (directionToScaryEnemy !== directionToUnoccupied) {
-        var value = Math.floor(Math.random() * (5 + 1)); //added random #0-5 to avoid loops 
-        console.log("Go to Unoccupied:"+value);
-        if (value==0 && directionToScaryEnemy !=='North') {
-          return 'North';
-        }if (value==1 && directionToScaryEnemy !=='South') {
-          return 'South';
-        } if (value==2 && directionToScaryEnemy !=='East') {
-          return 'East';
-        } if (value==3 && directionToScaryEnemy !=='West') {
-          return 'West';
-        }
         console.log("Go to Unoccupied!!");
         return directionToUnoccupied;
       }
@@ -258,7 +274,7 @@ var moves = {
       return directionToFriend;
     }
     
-    for (n = 2; n < 18; n++) { 
+    for (n = 2; n < 20; n++) { 
       if (directionToEnemy && distanceToEnemy < n){
         //unpredictable
         console.log("Enemy");
@@ -268,11 +284,11 @@ var moves = {
         console.log("Bones");
         return directionToBones;
       }
-      if (directionToMine && distanceToMine < n+1){
+      if (directionToMine && distanceToMine < n+1 && myHero.health > 30){
         console.log("Mine");
         return directionToMine;
       }
-      if (directionToHealthWell && distanceToHealthWell < n && myHero.health < (50 + 5*n)) {
+      if (directionToHealthWell && distanceToHealthWell < n && myHero.health < (50 + 5*n) && n < 10) {
         console.log("Health Well");
         return directionToHealthWell;
       } 
@@ -281,6 +297,9 @@ var moves = {
         console.log("Friend");
         return directionToFriend;
       }
+    }
+    if (directionToHealthWell){
+      return directionToHealthWell;
     }
     console.log("Default result");
     return directionToUnoccupied;
