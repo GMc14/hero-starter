@@ -148,13 +148,13 @@ var moves = {
     
     
     //Get stats on the nearest weak enemy
-    var enemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+    var weakEnemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
       return boardTile.type === 'Hero' && boardTile.team !== myHero.team && (boardTile.health < myHero.health - 10 || boardTile.health <= 20) ;
     });
     
         //Get stats on the nearest weak enemy
     var scaryEnemyStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
-      return boardTile.type === 'Hero' && boardTile.team !== myHero.team && boardTile.health >= myHero.health;
+      return boardTile.type === 'Hero' && boardTile.team !== myHero.team && boardTile.health > myHero.health;
     });
     
     //Get stats on the nearest friend in need
@@ -179,8 +179,8 @@ var moves = {
     var distanceToFriend = friendlyStats.distance;
     var directionToFriend = friendlyStats.direction;
     
-    var distanceToEnemy = enemyStats.distance;
-    var directionToEnemy = enemyStats.direction;
+    var distanceToWeakEnemy = weakEnemyStats.distance;
+    var directionToWeakEnemy = weakEnemyStats.direction;
     
     var distanceToCrippledEnemy = crippledEnemyStats.distance;
     var directionToCrippledEnemy = crippledEnemyStats.direction;
@@ -204,7 +204,7 @@ var moves = {
     console.log("distanceToMine: "+distanceToMine);
     console.log("distanceToHealthWell: "+distanceToHealthWell);
     console.log("distanceToFriend: "+ distanceToFriend);
-    console.log("distanceToEnemy: "+distanceToEnemy);
+    console.log("distanceToWeakEnemy: "+distanceToWeakEnemy);
     console.log("distanceToUnoccupied: "+distanceToUnoccupied);
     
     console.log("...[][][]...");    
@@ -214,7 +214,7 @@ var moves = {
     console.log("directionToMine: "+directionToMine);
     console.log("directionToHealthWell: "+directionToHealthWell);
     console.log("directionToFriend: "+ directionToFriend);
-    console.log("directionToEnemy: "+directionToEnemy);
+    console.log("directionToWeakEnemy: "+directionToWeakEnemy);
     console.log("directionToUnoccupied: "+directionToUnoccupied);
     
     if (directionToCrippledEnemy && distanceToCrippledEnemy <= 2) {
@@ -243,9 +243,9 @@ var moves = {
      return directionToMine;
     }
     
-    if (directionToEnemy && distanceToEnemy <= 2 && (distanceToScaryEnemy > distanceToEnemy || directionToScaryEnemy !== directionToEnemy)) {
-     console.log("Go to enemy");
-     return directionToEnemy;
+    if (directionToWeakEnemy && distanceToWeakEnemy <= 2 && (distanceToScaryEnemy > distanceToWeakEnemy || directionToScaryEnemy !== directionToWeakEnemy)) {
+     console.log("Go to WeakEnemy");
+     return directionToWeakEnemy;
     }
     
     if (directionToScaryEnemy && distanceToScaryEnemy <= 2) {
@@ -263,22 +263,22 @@ var moves = {
         return 'West';
       }
         
-      if (directionToScaryEnemy !== directionToUnoccupied) {
+      if (directionToScaryEnemy !== directionToUnoccupied && myHero.health < 90) {
         console.log("Go to Unoccupied!!");
         return directionToUnoccupied;
       }
     }
     
-    if (directionToFriend && distanceToFriend < 4 && (directionToMine === directionToFriend || directionToBones === directionToFriend || directionToEnemy === directionToFriend || distanceToFriend < 2) && distanceToScaryEnemy > 1 && (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !== directionToFriend)) {
+    if (directionToFriend && distanceToFriend < 4 && (directionToMine === directionToFriend || directionToBones === directionToFriend || directionToWeakEnemy === directionToFriend || distanceToFriend < 2) && distanceToScaryEnemy > 1 && (distanceToScaryEnemy > distanceToFriend || directionToScaryEnemy !== directionToFriend)) {
       console.log("Go to friend");
       return directionToFriend;
     }
     
-    for (n = 2; n < 20; n++) { 
-      if (directionToEnemy && distanceToEnemy < n){
+    for (n = 2; n < 99; n++) { 
+      if (directionToWeakEnemy && distanceToWeakEnemy < n){
         //unpredictable
-        console.log("Enemy");
-        return directionToEnemy;
+        console.log("WeakEnemy");
+        return directionToWeakEnemy;
       }
       if (directionToBones && distanceToBones < n+1){
         console.log("Bones");
