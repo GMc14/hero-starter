@@ -238,7 +238,9 @@ var moves = {
      console.log("Shoot First");
      return directionToCrippledEnemy;
     }
-    var shouldLookForSafety = myHero.health <= (81  - (gameData.turn/17)) && distanceToScaryEnemy <= 3;
+    var shouldLookForSafety = myHero.health <= (81  - (gameData.turn/17)) && distanceToScaryEnemy <= 2;
+    console.log("Health:"+myHero.health);
+    console.log("shouldLookForSafety:"+shouldLookForSafety);
     if (distanceToHealthWell === 1 && (myHero.health <= 60 || shouldLookForSafety)) {
       console.log("Quick heal");
       return directionToHealthWell;
@@ -272,17 +274,12 @@ var moves = {
         console.log("Go to Opposite Dirction");
         return directionToUnoccupied;
       }
-        console.log("Go to Unoccupied: "+value);
-      var value = Math.floor(Math.random() * (10)); //added random #0-9 to avoid loops 
-      if (value==0 && directionToScaryEnemy !=='North') {
-        return 'North';
-      }if (value==1 && directionToScaryEnemy !=='South') {
-        return 'South';
-      } if (value==2 && directionToScaryEnemy !=='East') {
-        return 'East';
-      } if (value==3 && directionToScaryEnemy !=='West') {
-        return 'West';
-      }
+     if (gameData.board.getTileNearby(myHero.distanceFromTop,myHero.distanceFromLeft,OppositeDirection[directionToScaryEnemy]).type === "Unoccupied")
+     {
+       console.log("Go to Opposite Direction 2");
+      return OppositeDirection[directionToScaryEnemy];
+     }
+      return = OppositeDirection[Math.floor(Math.random()*OppositeDirection.length)];
         
       if (directionToScaryEnemy !== directionToUnoccupied && myHero.health < 90) {
         console.log("Go to Unoccupied!!");
