@@ -38,7 +38,7 @@
   Such is the power of Javascript!!!
 
 */
-
+var OppositeDirection = {North:'South', East:'West', South:'North', West:'East'};
 // Strategy definitions
 var moves = {
   // Aggressor
@@ -221,13 +221,13 @@ var moves = {
      console.log("Shoot First");
      return directionToCrippledEnemy;
     }
-    
-    if (distanceToHealthWell === 1 && myHero.health <= 60) {
+    var shouldLookForSafety = myHero.health <= 80 && distanceToScaryEnemy <= 3;
+    if (distanceToHealthWell === 1 && (myHero.health <= 60 || shouldLookForSafety)) {
       console.log("Quick heal");
       return directionToHealthWell;
     } 
 
-    if (myHero.health <= 40) {
+    if (myHero.health <= 40 || shouldLookForSafety) {
       if (directionToHealthWell && distanceToHealthWell <= 2) {
         console.log("Go to heal now!");
         return directionToHealthWell;
@@ -248,11 +248,15 @@ var moves = {
      return directionToWeakEnemy;
     }
     
-    if (directionToScaryEnemy && distanceToScaryEnemy <= 2) {
+    if (shouldLookForSafety) {
       //RUN!
-      var value = Math.floor(Math.random() * (10)); //added random #0-9 to avoid loops 
-      
+
+      if (OppositeDirection[directionToScaryEnemy] === directionToUnoccupied) {
+        console.log("Go to Opposite Dirction");
+        return directionToUnoccupied;
+      }
         console.log("Go to Unoccupied: "+value);
+      var value = Math.floor(Math.random() * (10)); //added random #0-9 to avoid loops 
       if (value==0 && directionToScaryEnemy !=='North') {
         return 'North';
       }if (value==1 && directionToScaryEnemy !=='South') {
