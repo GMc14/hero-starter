@@ -133,7 +133,20 @@ var moves = {
     var mineStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
       if (boardTile.type === 'DiamondMine') {
         if (boardTile.owner) {
-          return boardTile.owner.team !== myHero.team;
+          return boardTile.owner.team !== myHero.team || boardTile.owner.dead;
+        } else {
+          return true;
+        }
+      }
+        return false;
+      
+    });
+    
+        //Get stats on the nearest nonTeam mine
+    var anyMineStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+      if (boardTile.type === 'DiamondMine') {
+        if (boardTile.owner) {
+          return boardTile.owner !== myHero.team;
         } else {
           return true;
         }
@@ -185,8 +198,12 @@ var moves = {
     var distanceToCrippledEnemy = crippledEnemyStats.distance;
     var directionToCrippledEnemy = crippledEnemyStats.direction;
     
+    
     var distanceToMine = mineStats.distance;
     var directionToMine = mineStats.direction;
+  
+    var distanceToAnyMine = anyMineStats.distance;
+    var directionToAnyMine = anyMineStats.direction;
     
     var distanceToScaryEnemy = scaryEnemyStats.distance;
     var directionToScaryEnemy = scaryEnemyStats.direction;
@@ -221,7 +238,7 @@ var moves = {
      console.log("Shoot First");
      return directionToCrippledEnemy;
     }
-    var shouldLookForSafety = myHero.health <= 80 && distanceToScaryEnemy <= 3;
+    var shouldLookForSafety = myHero.health <= (81  - (gameData.turn/17)) && distanceToScaryEnemy <= 3;
     if (distanceToHealthWell === 1 && (myHero.health <= 60 || shouldLookForSafety)) {
       console.log("Quick heal");
       return directionToHealthWell;
@@ -284,7 +301,7 @@ var moves = {
         console.log("WeakEnemy");
         return directionToWeakEnemy;
       }
-      if (directionToBones && distanceToBones < n+1){
+      if (directionToBones && distanceToBones < n+1 && directionToBones !== directionToScaryEnemy){
         console.log("Bones");
         return directionToBones;
       }
