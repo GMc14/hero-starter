@@ -279,7 +279,17 @@ var moves = {
        console.log("Go to Opposite Direction 2");
       return OppositeDirection[directionToScaryEnemy];
      }
-      return = OppositeDirection[Math.floor(Math.random()*OppositeDirection.length)];
+      var value = Math.floor(Math.random() * (10)); //added random #0-9 to avoid loops 
+             console.log("Go to Unoccupied: "+value);
+      if (value==0 && directionToScaryEnemy !=='North') {
+        return 'North';
+      }if (value==1 && directionToScaryEnemy !=='South') {
+        return 'South';
+      } if (value==2 && directionToScaryEnemy !=='East') {
+        return 'East';
+      } if (value==3 && directionToScaryEnemy !=='West') {
+        return 'West';
+      }
         
       if (directionToScaryEnemy !== directionToUnoccupied && myHero.health < 90) {
         console.log("Go to Unoccupied!!");
